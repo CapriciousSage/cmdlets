@@ -1,0 +1,10 @@
+Windows Registry Editor Version 5.00
+
+; Requires Windows 7 and higher
+; Removes right-click context menus for FileBot to both files and folders.
+
+[-HKEY_CLASSES_ROOT\FileBot]
+
+[-HKEY_CLASSES_ROOT\*\shell\filebot_anchor]
+
+[-HKEY_CLASSES_ROOT\Folder\shell\filebot_anchor]
