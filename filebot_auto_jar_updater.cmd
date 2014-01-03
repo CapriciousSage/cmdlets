@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Automatic jar file Updater v1.0
+	FileBot Automatic jar file Updater v1.1
 
 	Written by CapriciousSage (Ithiel)
 	Requires Filebot to be installed in C:\Program Files\FileBot\
@@ -15,7 +15,7 @@ GOTO EndComment
 	Please Donate via PayPal to reinhard.pointner@gmail.com
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 03/01/2014
+	Last Updated: 04/01/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -51,6 +51,7 @@ GOTO DOWNLOAD
 :DOWNLOAD
 
 	set logfile="%tmp%\filebot_automatic_updater.txt"
+	set downloadURL="http://sourceforge.net/projects/filebot/files/filebot/HEAD/FileBot.jar"
 
 	IF EXIST "C:\Program Files\FileBot\FileBot_old.jar" (
 		echo Deleting "C:\Program Files\FileBot\FileBot_old.jar" >> %logfile%
@@ -62,8 +63,8 @@ GOTO DOWNLOAD
 	echo Renaming current FileBot.jar to FileBot_old.jar >> %logfile%
 	ren "C:\Program Files\FileBot\FileBot.jar" FileBot_old.jar
 
-	echo Downloading Latest Filebot.jar >> %logfile%
-	bitsadmin.exe /transfer "Download_FileBot" "http://aarnet.dl.sourceforge.net/project/filebot/filebot/HEAD/FileBot.jar" "C:\Program Files\FileBot\FileBot.jar"
+	echo Downloading Latest Filebot.jar from %downloadURL% >> %logfile%
+	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "C:\Program Files\FileBot\FileBot.jar"
 
 	if not errorlevel 0 GOTO ERR1
 
