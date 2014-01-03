@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.1b
+	FileBot Advanced Context Menu v1.1c
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -183,7 +183,7 @@ GOTO INSTALL-STEP2
 	echo :: To remove the language tag from subtitles (so .eng.srt becomes .srt)  > %remlangtag%
 	echo :: simply drag and drop the subtitle files onto this script in explorer >> %remlangtag%
 	echo. >> %remlangtag%
-	echo filebot -script fn:replace --filter "[.](srt|sub|ass)$" --def "e=^(.+)([.]\w+)([.]\w+)$" "r=$1$3" %* >> %remlangtag%
+	echo filebot -script fn:replace --filter "[.](srt|sub|ass)$" --def "e=^(.+)([.]\w+)([.]\w+)$" "r=$1$3" ^%* >> %remlangtag%
 
 	echo Writing Subtitle Language Tag Removal Script Complete >> %logfile%
 
