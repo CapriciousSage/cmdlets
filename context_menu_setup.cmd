@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.1
+	FileBot Advanced Context Menu v1.1b
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -53,6 +53,7 @@ GOTO SETUP
 	set oslogin="C:\Program Files\FileBot\cmdlets\opensubtitles_login.cmd"
 	set remlangtag="C:\Program Files\FileBot\cmdlets\remove-language-tag.cmd"
 	:: set newline=^& echo.
+	mkdir "C:\Program Files\FileBot\cmdlets"
 
 	echo --------------------------- >> %logfile%
 	echo Advanced Context Menu Setup >> %logfile%
@@ -83,7 +84,7 @@ GOTO SETUP
 	GOTO anime-output
 
 	:anime-output
-	call :inputbox "Please enter output folder where you want to store your Anime. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "Advanced Context Menu Setup" "%USERPROFILE%\Videos\"
+	call :inputbox "Please enter output folder where you want to store your Anime. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "Anime Output Folder" "%USERPROFILE%\Videos\"
 
 		if NOT "%Input%"=="" (
 			GOTO anime-fixed
@@ -102,7 +103,7 @@ GOTO SETUP
 		GOTO tvshow-output
 			
 	:tvshow-output
-	call :inputbox "Please enter output folder where you want to store your TV Shows. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "Advanced Context Menu Setup" "%USERPROFILE%\Videos\"
+	call :inputbox "Please enter output folder where you want to store your TV Shows. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "TV Shows Output Folder" "%USERPROFILE%\Videos\"
 
 		if NOT "%Input%"=="" (
 			GOTO tv-fixed
@@ -121,7 +122,7 @@ GOTO SETUP
 		GOTO movie-output
 
 	:movie-output
-	call :inputbox "Please enter output folder where you want to store your Movies. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "Advanced Context Menu Setup" "%USERPROFILE%\Videos\"
+	call :inputbox "Please enter output folder where you want to store your Movies. No quotes or escapes required, but please include trailing slash. UNC paths are supported" "Movies Output Folder" "%USERPROFILE%\Videos\"
 
 		if NOT "%Input%"=="" (
 			GOTO movie-fixed
@@ -173,7 +174,7 @@ GOTO INSTALL-STEP2
 	echo :: It is recommend you create/log into an OpenSubtitles.org account before >> %oslogin%
 	echo :: downloading large amounts of subtitles as it increases the anti-leech limit. >> %oslogin%
 	echo. >> %oslogin%
-	echo filebot -script fn:configure.login >> %oslogin%
+	echo filebot -script fn:osdb.login >> %oslogin%
 
 	echo Writing OpenSubtitles.org Login Script Complete >> %logfile%
 
