@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.1d
+	FileBot Advanced Context Menu v1.1e
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -13,7 +13,7 @@ GOTO EndComment
 	Please Donate via PayPal to reinhard.pointner@gmail.com
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 03/01/2014
+	Last Updated: 06/01/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -186,6 +186,13 @@ GOTO INSTALL-STEP2
 	echo filebot -script fn:replace --filter "[.](srt|sub|ass)$" --def "e=^(.+)([.]\w+)([.]\w+)$" "r=$1$3" %%* >> %remlangtag%
 
 	echo Writing Subtitle Language Tag Removal Script Complete >> %logfile%
+
+	echo Creating FileBot Jar Updater >> %logfile%
+
+	bitsadmin.exe /transfer "Download_Auto_Updater" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_auto_jar_updater.cmd" "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd"
+
+	echo Finished Creating FileBot Jar Updater >> %logfile%
+
 
 	if not errorlevel 0 GOTO ERR1
 
