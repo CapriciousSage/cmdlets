@@ -362,6 +362,13 @@ GOTO ALLOK
 		echo No movies.groovy File to Delete >> %logfile%
 	)
 
+	IF EXIST "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd" (
+		echo Deleting "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd" >> %logfile%
+		del "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd"
+	) ELSE (
+		echo No Jar Auto Updater to Delete >> %logfile%
+	)
+
 	echo File Removal Complete. Proceeding to reg file uninstall.
 
 GOTO UNINSTALL-REGONLY
