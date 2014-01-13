@@ -1,9 +1,10 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Automatic jar file Updater v1.1
+	FileBot Automatic jar file Updater v1.2
 
 	Written by CapriciousSage (Ithiel)
+	Modified by Akkifokkusu
 	Requires Filebot to be installed in C:\Program Files\FileBot\
 	This file requires Administrative Privileges
 	Note: The only file that this tool updates is FileBot.jar
@@ -32,12 +33,12 @@ GOTO EndComment
 	) else ( goto gotAdmin )
 
 	:UACPrompt
-	    echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+	    echo Set UAC = CreateObject^("Shell.Application"^) > "%~dp0\getadmin.vbs"
 	    set params = %*:"=""
-	    echo UAC.ShellExecute "cmd.exe", "/c %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs"
+	    echo UAC.ShellExecute "cmd.exe", "/c %~s0 %params%", "", "runas", 1 >> "%~dp0\getadmin.vbs"
 
-	    "%temp%\getadmin.vbs"
-	    del "%temp%\getadmin.vbs"
+	    "%~dp0\getadmin.vbs"
+	    del "%~dp0\getadmin.vbs"
 	    exit /B
 
 	:gotAdmin
@@ -53,6 +54,13 @@ GOTO DOWNLOAD
 	set logfile="%tmp%\filebot_automatic_updater.txt"
 	set downloadURL="http://sourceforge.net/projects/filebot/files/filebot/HEAD/FileBot.jar"
 
+	echo Downloading Latest Filebot.jar from %downloadURL% >> %logfile%
+	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "%temp%\FileBot.jar"
+
+	if not errorlevel 0 GOTO ERR1
+	
+	echo Download successful. >> %logfile%
+
 	IF EXIST "C:\Program Files\FileBot\FileBot_old.jar" (
 		echo Deleting "C:\Program Files\FileBot\FileBot_old.jar" >> %logfile%
 		del "C:\Program Files\FileBot\FileBot_old.jar"
@@ -63,11 +71,9 @@ GOTO DOWNLOAD
 	echo Renaming current FileBot.jar to FileBot_old.jar >> %logfile%
 	ren "C:\Program Files\FileBot\FileBot.jar" FileBot_old.jar
 
-	echo Downloading Latest Filebot.jar from %downloadURL% >> %logfile%
-	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "C:\Program Files\FileBot\FileBot.jar"
-
-	if not errorlevel 0 GOTO ERR1
-
+	echo Installing new Filebot.jar >> %logfile%
+	move "%temp%\FileBot.jar" "C:\Program Files\FileBot\FileBot.jar"
+	
 	echo FileBot Update Complete >> %logfile%
 
 GOTO ALLOK
