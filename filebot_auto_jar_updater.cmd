@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Automatic jar file Updater v1.2
+	FileBot Automatic jar file Updater v1.3
 
 	Written by CapriciousSage (Ithiel)
 	Modified by Akkifokkusu
@@ -16,7 +16,7 @@ GOTO EndComment
 	Please Donate via PayPal to reinhard.pointner@gmail.com
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 04/01/2014
+	Last Updated: 14/01/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -54,8 +54,14 @@ GOTO DOWNLOAD
 	set logfile="%tmp%\filebot_automatic_updater.txt"
 	set downloadURL="http://sourceforge.net/projects/filebot/files/filebot/HEAD/FileBot.jar"
 
+	echo --------------------------- >> %logfile%
+	echo FileBot Automatic Jar File Updater >> %logfile%
+	echo Date: %date% >> %logfile%
+	echo --------------------------- >> %logfile%
+	echo. >> %logfile%
+
 	echo Downloading Latest Filebot.jar from %downloadURL% >> %logfile%
-	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "%temp%\FileBot.jar"
+	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "%tmp%\FileBot.jar"
 
 	if not errorlevel 0 GOTO ERR1
 	
@@ -72,7 +78,7 @@ GOTO DOWNLOAD
 	ren "C:\Program Files\FileBot\FileBot.jar" FileBot_old.jar
 
 	echo Installing new Filebot.jar >> %logfile%
-	move "%temp%\FileBot.jar" "C:\Program Files\FileBot\FileBot.jar"
+	move "%tmp%\FileBot.jar" "C:\Program Files\FileBot\FileBot.jar"
 	
 	echo FileBot Update Complete >> %logfile%
 
@@ -94,4 +100,4 @@ GOTO FINISH
 
 
 :FINISH
-ECHO EXIT /B
+EXIT /B

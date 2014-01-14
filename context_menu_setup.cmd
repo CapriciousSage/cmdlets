@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.1e
+	FileBot Advanced Context Menu v1.2
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -13,7 +13,7 @@ GOTO EndComment
 	Please Donate via PayPal to reinhard.pointner@gmail.com
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 06/01/2014
+	Last Updated: 14/01/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -30,12 +30,12 @@ GOTO EndComment
 	) else ( goto gotAdmin )
 
 	:UACPrompt
-	    echo Set UAC = CreateObject^("Shell.Application"^) > "%temp%\getadmin.vbs"
+	    echo Set UAC = CreateObject^("Shell.Application"^) > "%~dp0\getadmin.vbs"
 	    set params = %*:"=""
-	    echo UAC.ShellExecute "cmd.exe", "/c %~s0 %params%", "", "runas", 1 >> "%temp%\getadmin.vbs"
+	    echo UAC.ShellExecute "cmd.exe", "/c %~s0 %params%", "", "runas", 1 >> "%~dp0\getadmin.vbs"
 
-	    "%temp%\getadmin.vbs"
-	    del "%temp%\getadmin.vbs"
+	    "%~dp0\getadmin.vbs"
+	    del "%~dp0\getadmin.vbs"
 	    exit /B
 
 	:gotAdmin
@@ -61,16 +61,16 @@ GOTO SETUP
 	echo --------------------------- >> %logfile%
 	echo. >> %logfile%
 
-	echo set WshShell = WScript.CreateObject("WScript.Shell") > %tmp%\tmp.vbs
-	echo WScript.Quit (WshShell.Popup( "How would you like to proceed?" + vbCRLF + "   - Select Yes to install" + vbCRLF + "   - Select No to uninstall" + vbCRLF + "   - Select Cancel to exit without making changes" ,,"Advanced Context Menu Setup", 3+32)) >> %tmp%\tmp.vbs
-	cscript /nologo %tmp%\tmp.vbs
+	echo set WshShell = WScript.CreateObject("WScript.Shell") > %~dp0\tmp.vbs
+	echo WScript.Quit (WshShell.Popup( "How would you like to proceed?" + vbCRLF + "   - Select Yes to install" + vbCRLF + "   - Select No to uninstall" + vbCRLF + "   - Select Cancel to exit without making changes" ,,"Advanced Context Menu Setup", 3+32)) >> %~dp0\tmp.vbs
+	cscript /nologo %~dp0\tmp.vbs
 	if %errorlevel%==6 (
 		echo Proceeding With Install >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
 		GOTO INSTALL-STEP1
 	) else if %errorlevel%== 7 (
 		echo Proceeding With Uninstall >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
   		GOTO UNINSTALL-STEP1
 	) else (
 		echo Now Exiting... >> %logfile%
@@ -193,6 +193,12 @@ GOTO INSTALL-STEP2
 
 	echo Finished Creating FileBot Jar Updater >> %logfile%
 
+	echo Creating Subtitle Fetch Language Changer >> %logfile%
+
+	bitsadmin.exe /transfer "Download_Sub_Lang_Changer" "https://github.com/CapriciousSage/cmdlets/raw/master/change_subtitle_fetch_language.cmd" "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd"
+
+	echo Finished Subtitle Fetch Language Changer >> %logfile%
+
 
 	if not errorlevel 0 GOTO ERR1
 
@@ -201,17 +207,17 @@ GOTO INSTALL-STEP3
 
 :INSTALL-STEP3
 
-	echo set WshShell = WScript.CreateObject("WScript.Shell") > %tmp%\tmp.vbs
-	echo WScript.Quit (WshShell.Popup( "Would you like to use our self-updating (cloud managed) naming scheme?" ,,"Advanced Context Menu Setup", 3+32)) >> %tmp%\tmp.vbs
-	cscript /nologo %tmp%\tmp.vbs
+	echo set WshShell = WScript.CreateObject("WScript.Shell") > %~dp0\tmp.vbs
+	echo WScript.Quit (WshShell.Popup( "Would you like to use our self-updating (cloud managed) naming scheme?" ,,"Advanced Context Menu Setup", 3+32)) >> %~dp0\tmp.vbs
+	cscript /nologo %~dp0\tmp.vbs
 
 	if %errorlevel%==6 (
 		echo Proceeding With Cloud Integration for Naming Scheme >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
 		GOTO INSTALL-REMOTE
 	) else if %errorlevel%== 7 (
 		echo Proceeding With Locally Managed Naming Scheme >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
   		GOTO INSTALL-LOCAL
 	) else (
 		echo Now Exiting... >> %logfile%
@@ -227,13 +233,13 @@ GOTO ALLOK
 
 	echo Downloading Latest Install Registry Script >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install.reg" "%tmp%\context_menu_install.reg"
+	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install.reg" "%~dp0\context_menu_install.reg"
 
 	echo Installing Registry Entries >> %logfile%
-	regedit.exe /S "%tmp%\context_menu_install.reg"
+	regedit.exe /S "%~dp0\context_menu_install.reg"
 
 	echo Deleting Temporary Install File >> %logfile%
-	del "%tmp%\context_menu_install.reg"
+	del "%~dp0\context_menu_install.reg"
 
 	if not errorlevel 0 GOTO ERR1
 
@@ -258,13 +264,13 @@ GOTO ALLOK
 
 	echo Downloading Latest Install Registry Script >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install_local.reg" "%tmp%\context_menu_install_local.reg"
+	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install_local.reg" "%~dp0\context_menu_install_local.reg"
 
 	echo Installing Registry Entries >> %logfile%
-	regedit.exe /S "%tmp%\context_menu_install_local.reg"
+	regedit.exe /S "%~dp0\context_menu_install_local.reg"
 
 	echo Deleting Temporary Install File >> %logfile%
-	del "%tmp%\context_menu_install_local.reg"
+	del "%~dp0\context_menu_install_local.reg"
 
 	if not errorlevel 0 GOTO ERR1
 
@@ -275,17 +281,17 @@ GOTO ALLOK
 
 :UNINSTALL-STEP1
 
-	echo set WshShell = WScript.CreateObject("WScript.Shell") > %tmp%\tmp.vbs
-	echo WScript.Quit (WshShell.Popup( "Would you like to remove cmdlets as well?'." ,,"Advanced Context Menu Setup", 3+32)) >> %tmp%\tmp.vbs
-	cscript /nologo %tmp%\tmp.vbs
+	echo set WshShell = WScript.CreateObject("WScript.Shell") > %~dp0\tmp.vbs
+	echo WScript.Quit (WshShell.Popup( "Would you like to remove cmdlets as well?'." ,,"Advanced Context Menu Setup", 3+32)) >> %~dp0\tmp.vbs
+	cscript /nologo %~dp0\tmp.vbs
 
 	if %errorlevel%==6 (
 		echo Removing registry entries and cmdlets >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
 		GOTO UNINSTALL-FULL
 	) else if %errorlevel%== 7 (
 		echo Removing registry entries only >> %logfile%
-		del %tmp%\tmp.vbs
+		del %~dp0\tmp.vbs
   		GOTO UNINSTALL-REGONLY
 	) else (
 		echo Now Exiting... >> %logfile%
@@ -369,6 +375,13 @@ GOTO ALLOK
 		echo No Jar Auto Updater to Delete >> %logfile%
 	)
 
+	IF EXIST "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd" (
+		echo Deleting "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd" >> %logfile%
+		del "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd"
+	) ELSE (
+		echo No Jar Auto Updater to Delete >> %logfile%
+	)
+
 	echo File Removal Complete. Proceeding to reg file uninstall.
 
 GOTO UNINSTALL-REGONLY
@@ -378,13 +391,13 @@ GOTO UNINSTALL-REGONLY
 
 	echo Downloading Latest Uninstall Registry Script >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Uninstall" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_uninstall.reg" "%tmp%\context_menu_uninstall.reg"
+	bitsadmin.exe /transfer "Download_Uninstall" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_uninstall.reg" "%~dp0\context_menu_uninstall.reg"
 
 	echo Uninstalling Registry Entries >> %logfile%
-	regedit.exe /S "%tmp%\context_menu_uninstall.reg"
+	regedit.exe /S "%~dp0\context_menu_uninstall.reg"
 
 	echo Deleting Temporary Uninstall File >> %logfile%
-	del "%tmp%\context_menu_uninstall.reg"
+	del "%~dp0\context_menu_uninstall.reg"
 
 	if not errorlevel 0 GOTO ERR1
 
@@ -398,9 +411,9 @@ GOTO ALLOK
 	set default=%~3
 	set heading=%~2
 	set message=%~1
-	echo wscript.echo inputbox(WScript.Arguments(0),WScript.Arguments(1),WScript.Arguments(2)) >"%tmp%\input.vbs"
-	for /f "tokens=* delims=" %%a in ('cscript //nologo "%tmp%\input.vbs" "%message%" "%heading%" "%default%"') do set input=%%a
-	del %tmp%\input.vbs
+	echo wscript.echo inputbox(WScript.Arguments(0),WScript.Arguments(1),WScript.Arguments(2)) >"%~dp0\input.vbs"
+	for /f "tokens=* delims=" %%a in ('cscript //nologo "%~dp0\input.vbs" "%message%" "%heading%" "%default%"') do set input=%%a
+	del %~dp0\input.vbs
 exit /b
 
 :ERR1
@@ -419,4 +432,4 @@ GOTO FINISH
 
 :FINISH
 %logfile%
-ECHO EXIT /B
+EXIT /B
