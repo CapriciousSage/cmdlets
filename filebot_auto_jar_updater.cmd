@@ -36,6 +36,7 @@ GOTO EndComment
 
 		copy /Y NUL "%~dp0\.writable" > NUL 2>&1 && set WRITEOK=1
 		IF DEFINED WRITEOK ( 
+			del "%~dp0\.writable"
 			GOTO UACPrompt1
 		 ) else (
 			echo Checking profile instead...
@@ -46,6 +47,7 @@ GOTO EndComment
 
 		copy /Y NUL "%USERPROFILE%\.writable" > NUL 2>&1 && set WRITEOK=1
 		IF DEFINED WRITEOK ( 
+			del "%USERPROFILE%\.writable"
 			GOTO UACPrompt2
 		 ) else (
 			echo Checking temp instead...
@@ -56,6 +58,7 @@ GOTO EndComment
 
 		copy /Y NUL "%tmp%\.writable" > NUL 2>&1 && set WRITEOK=1
 		IF DEFINED WRITEOK ( 
+			del "%tmp%\.writable"
 			GOTO UACPrompt3
 		 ) else (
 			GOTO UACFailed
