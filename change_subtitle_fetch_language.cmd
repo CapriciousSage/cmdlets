@@ -128,10 +128,9 @@ GOTO EndComment
 		CD /D "%~dp0"
 	:--------------------------------------
 
-GOTO ASKLANG
+GOTO ASKCOUNT
 
-
-:ASKLANG
+:ASKCOUNT
 
 	set logfile="%tmp%\filebot_sub_fetch_lang_change.txt"
 
@@ -141,10 +140,118 @@ GOTO ASKLANG
 	echo --------------------------------------- >> %logfile%
 	echo. >> %logfile%
 
-	GOTO request-lang
+	GOTO request-lang-count
 
-	:request-lang
-	call :inputbox "Please enter the preferred subtitle language using the two digit language code" "Subtitle Language Selection" "en"
+	:request-lang-count
+	call :inputbox "How many subtitle languages do you want to fetch?" "Number of Subtitle Language" "1"
+
+		if NOT "%Input%"=="" (
+			GOTO count-check
+		) ELSE (
+			GOTO count-default
+		)
+
+		:count-check
+		SET /A TestVal="%Input%"*1
+
+		if "%TestVal%"=="%Input%" (
+			GOTO check-min
+		) ELSE (
+			:: input was not a number
+			GOTO count-default
+		)
+
+		:check-min
+		if %Input% GEQ 1 (
+			:: one or more
+			GOTO count-fixed
+		) ELSE (
+			:: less than one
+			GOTO count-default
+		)
+
+		:count-fixed
+			set "langcount=%Input%"
+			echo Subtitle Languages Required: %langcount% >> %logfile%
+		GOTO finished-count-output
+
+		:count-default	
+			set "langcount=1"
+			echo Invalid Input Detected. Defaulting to %langcount% >> %logfile%
+		GOTO finished-count-output
+
+		:finished-count-output
+
+	if not errorlevel 0 GOTO ERR1
+
+GOTO StartLoop
+	
+	
+:StartLoop
+
+	SET COUNT=0
+
+	:CountLoop
+	
+		if %COUNT% GEQ %langcount% (
+			:: done checking for subtitles
+			GOTO ALLOK
+		) ELSE (
+			:: input was not a number
+			GOTO MAIN-PROCESS
+		)
+
+		:MAIN-PROCESS
+
+			call :ASKLANG
+
+			if "%COUNT%"=="0" (
+				call :CHANGELANG
+			) ELSE (
+				call :CHANGELANGMULTI
+			)
+
+		SET /A COUNT+=1
+		
+	if not errorlevel 0 GOTO ERR1
+
+GOTO CountLoop
+
+
+:ASKLANG
+	set /a subCount=%COUNT%+1
+
+	set subCountChk1=%subCount:~-2,2%
+
+	IF %subCountChk1% EQU 11 ( 
+		GOTO set-th
+	) ELSE ( 
+		IF %subCountChk1% EQU 12 ( 
+			GOTO set-th
+		) ELSE ( 
+			IF %subCountChk1% EQU 13 ( 
+				GOTO set-th 
+			) ELSE ( 
+				GOTO set-other
+			)
+		)
+	)
+
+	:set-th
+		set "subCount=%subCount%th"
+	GOTO lang-output
+
+	:set-other
+		set subCountChk2=%subCount:~-1,1%
+		IF %subCountChk2% EQU 0 (set "subCount=%subCount%th")
+		IF %subCountChk2% EQU 1 (set "subCount=%subCount%st")
+		IF %subCountChk2% EQU 2 (set "subCount=%subCount%nd")
+		IF %subCountChk2% EQU 3 (set "subCount=%subCount%rd")
+		IF %subCountChk2% GEQ 4 (set "subCount=%subCount%th")
+	GOTO lang-output
+
+	:lang-output
+		call :inputbox "Please enter the %subCount% of %langcount% preferred subtitle language(s) using the two digit language code" "Subtitle Language Selection" "en"
 
 		if NOT "%Input%"=="" (
 			GOTO lang-fixed
@@ -162,16 +269,14 @@ GOTO ASKLANG
 			echo No Language Detected. Defaulting to %newlang% >> %logfile%
 		GOTO finished-output
 
-		:finished-output
+	:finished-output
 
 	if not errorlevel 0 GOTO ERR1
-
-GOTO CHANGELANG
+exit /b
 
 
 :CHANGELANG
-
-	echo Updating Language Settings >> %logfile%
+	echo Updating Language Settings (%newlang%) >> %logfile%
 
 	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -get-subtitles \"%%1\" -non-strict --lang %newlang% --log-file context.log" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -get-subtitles \"%%1\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO" /f
@@ -180,9 +285,55 @@ GOTO CHANGELANG
 
 	if not errorlevel 0 GOTO ERR1
 	
-	echo Update Successful. >> %logfile%
+	echo Update Successful (%newlang%). >> %logfile%
+exit /b
 
-GOTO ALLOK
+
+:CHANGELANGMULTI
+	echo Updating Language Settings (%newlang%) >> %logfile%
+
+	set "File0203add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "File0204add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
+	    set File0203current=%%A %%B
+	    )
+	set "File0203current=%File0203current% ^&^& %File0203add%"
+	set "File0203current=%File0203current:"=^\"%"
+	set "File0203current=%File0203current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /ve`) DO (
+	    set File0204current=%%A %%B
+	    )
+	set "File0204current=%File0204current% ^&^& %File0204add%"
+	set "File0204current=%File0204current:"=^\"%"
+	set "File0204current=%File0204current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
+	    set Folder0203current=%%A %%B
+	    )
+	set "Folder0203current=%Folder0203current% ^&^& %Folder0203add%"
+	set "Folder0203current=%Folder0203current:"=^\"%"
+	set "Folder0203current=%Folder0203current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /ve`) DO (
+	    set Folder0204current=%%A %%B
+	    )
+	set "Folder0204current=%Folder0204current% ^&^& %Folder0204add%"
+	set "Folder0204current=%Folder0204current:"=^\"%"
+	set "Folder0204current=%Folder0204current:^=%"
+
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%File0203current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%File0204current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%Folder0203current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%Folder0204current%" /f
+
+	if not errorlevel 0 GOTO ERR1
+	
+	echo Update Successful (%newlang%). >> %logfile%
+exit /b
 
 
 :InputBox
