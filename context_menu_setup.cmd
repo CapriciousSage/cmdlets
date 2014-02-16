@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.3
+	FileBot Advanced Context Menu v1.4
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -13,7 +13,7 @@ GOTO EndComment
 	Please Donate via PayPal to reinhard.pointner@gmail.com
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 14/01/2014
+	Last Updated: 16/02/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -282,7 +282,6 @@ GOTO INSTALL-STEP2
 
 	echo Finished Subtitle Fetch Language Changer >> %logfile%
 
-
 	if not errorlevel 0 GOTO ERR1
 
 GOTO INSTALL-STEP3
@@ -297,11 +296,11 @@ GOTO INSTALL-STEP3
 	if %errorlevel%==6 (
 		echo Proceeding With Cloud Integration for Naming Scheme >> %logfile%
 		del %~dp0\tmp.vbs
-		GOTO INSTALL-REMOTE
+		GOTO SET-REMOTE
 	) else if %errorlevel%== 7 (
 		echo Proceeding With Locally Managed Naming Scheme >> %logfile%
 		del %~dp0\tmp.vbs
-  		GOTO INSTALL-LOCAL
+  		GOTO SET-LOCAL
 	) else (
 		echo Now Exiting... >> %logfile%
 		GOTO ALLOK
@@ -312,26 +311,19 @@ GOTO INSTALL-STEP3
 GOTO ALLOK
 
 
-:INSTALL-REMOTE
+:SET-REMOTE
 
-	echo Downloading Latest Install Registry Script >> %logfile%
-
-	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install.reg" "%~dp0\context_menu_install.reg"
-
-	echo Installing Registry Entries >> %logfile%
-	regedit.exe /S "%~dp0\context_menu_install.reg"
-
-	echo Deleting Temporary Install File >> %logfile%
-	del "%~dp0\context_menu_install.reg"
+	echo Settings Cloud Groovy Path
+	set groovyPath=https://raw.github.com/CapriciousSage/scripts/master/
 
 	if not errorlevel 0 GOTO ERR1
 
 	echo Cloud Managed Install Complete >> %logfile%
 
-GOTO ALLOK
+GOTO PROCESS-REG
 
 
-:INSTALL-LOCAL
+:SET-LOCAL
 
 	echo Downloading Latest Rename Schemes for Local Management >> %logfile%
 
@@ -345,21 +337,291 @@ GOTO ALLOK
 	bitsadmin.exe /transfer "Download_TV_Shows_Scheme" "https://raw.github.com/CapriciousSage/scripts/master/tv_shows_local.groovy" "C:\Program Files\FileBot\cmdlets\tv_shows.groovy"
 	bitsadmin.exe /transfer "Download_Movies_Scheme" "https://raw.github.com/CapriciousSage/scripts/master/movies_local.groovy" "C:\Program Files\FileBot\cmdlets\movies.groovy"
 
-	echo Downloading Latest Install Registry Script >> %logfile%
-
-	bitsadmin.exe /transfer "Download_Install" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_install_local.reg" "%~dp0\context_menu_install_local.reg"
-
-	echo Installing Registry Entries >> %logfile%
-	regedit.exe /S "%~dp0\context_menu_install_local.reg"
-
-	echo Deleting Temporary Install File >> %logfile%
-	del "%~dp0\context_menu_install_local.reg"
+	echo Settings Local Groovy Path
+	set groovyPath=C:\\Program Files\\FileBot\\cmdlets\\
 
 	if not errorlevel 0 GOTO ERR1
 
 	echo Locally Managed Install Complete >> %logfile%
 
-GOTO ALLOK
+GOTO PROCESS-REG
+
+
+:PROCESS-REG
+
+	echo Installing First Round of Registry Entries
+
+	:: Parent Directory
+		reg add "HKEY_CLASSES_ROOT\FileBot" /v "MUIVerb" /t REG_SZ /d "FileBot" /f
+
+	:: File Menu
+		:: Rename
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename" /v "MUIVerb" /t REG_SZ /d "Rename" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\File_Menu\\shell\\001Rename" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\001Anime" /v "MUIVerb" /t REG_SZ /d "Anime (AniDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\001Anime\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%anime.groovy\" \"%%1\" --db AniDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\002theTVDB" /v "MUIVerb" /t REG_SZ /d "TV Show (theTVDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\002theTVDB\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%tv_shows.groovy\" \"%%1\" --db TheTVDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\003TVRage" /v "MUIVerb" /t REG_SZ /d "TV Show (TVRage)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\003TVRage\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%tv_shows.groovy\" \"%%1\" --db TVRage -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\004IMDb" /v "MUIVerb" /t REG_SZ /d "Movie (IMDb)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\004IMDb\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db IMDb -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\005TheMovieDB" /v MUIVerb"" /t REG_SZ /d "Movie (TheMovieDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\005TheMovieDB\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db TheMovieDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\006OpenSubtitles" /v "MUIVerb" /t REG_SZ /d "Movie (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\001Rename\shell\006OpenSubtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db OpenSubtitles -non-strict --log-file context.log" /f
+
+		:: Fetch
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch" /v "MUIVerb" /t REG_SZ /d "Fetch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\File_Menu\\shell\\002Fetch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\001TVArtworkTV" /v "MUIVerb" /t REG_SZ /d "Artwork for TV Shows (theTVDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\001TVArtworkTV\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:artwork.tvdb \"%%w\" --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\002ArtworkMovies" /v "MUIVerb" /t REG_SZ /d "Artwork for Movies (theMovieDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\002ArtworkMovies\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:artwork.tmdb \"%%w\" --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles with Language Tag (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles without Language Tag (OpenSubtitles)" /f
+
+	:: Folder Menu
+		:: Rename
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename" /v "MUIVerb" /t REG_SZ /d "Rename" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\Folder_Menu\\shell\\001Rename" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\001Anime" /v "MUIVerb" /t REG_SZ /d "Anime (AniDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\001Anime\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%anime.groovy\" \"%%1\" --db AniDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\002theTVDB" /v "MUIVerb" /t REG_SZ /d "TV Show (theTVDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\002theTVDB\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%tv_shows.groovy\" \"%%1\" --db TheTVDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\003TVRage" /v "MUIVerb" /t REG_SZ /d "TV Show (TVRage)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\003TVRage\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%tv_shows.groovy\" \"%%1\" --db TVRage -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\004IMDb" /v "MUIVerb" /t REG_SZ /d "Movie (IMDb)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\004IMDb\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db IMDb -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\005TheMovieDB" /v MUIVerb"" /t REG_SZ /d "Movie (TheMovieDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\005TheMovieDB\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db TheMovieDB -non-strict --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\006OpenSubtitles" /v "MUIVerb" /t REG_SZ /d "Movie (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\001Rename\shell\006OpenSubtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script \"%groovyPath%movies.groovy\" \"%%1\" --db OpenSubtitles -non-strict --log-file context.log" /f
+
+		:: Fetch
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch" /v "MUIVerb" /t REG_SZ /d "Fetch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\Folder_Menu\\shell\\002Fetch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\001TVArtworkTV" /v "MUIVerb" /t REG_SZ /d "Artwork for TV Shows (theTVDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\001TVArtworkTV\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:artwork.tvdb \"%%1\" --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\002ArtworkMovies" /v "MUIVerb" /t REG_SZ /d "Artwork for Movies (theMovieDB)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\002ArtworkMovies\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:artwork.tmdb \"%%1\" --log-file context.log" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles with Language Tag (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles without Language Tag (OpenSubtitles)" /f
+
+	:: Menu Call
+		:: File Menu
+			reg add "HKEY_CLASSES_ROOT\*\shell\filebot_anchor" /v "MUIVerb" /t REG_SZ /d "FileBot" /f
+			reg add "HKEY_CLASSES_ROOT\*\shell\filebot_anchor" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\File_Menu" /f
+			reg add "HKEY_CLASSES_ROOT\*\shell\filebot_anchor" /v "Icon" /t REG_SZ /d "\"C:\\Program Files\\FileBot\\filebot.exe\",0" /f
+
+		:: Folder Menu
+			reg add "HKEY_CLASSES_ROOT\Folder\shell\filebot_anchor" /v "MUIVerb" /t REG_SZ /d "FileBot" /f
+			reg add "HKEY_CLASSES_ROOT\Folder\shell\filebot_anchor" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\Folder_Menu" /f
+			reg add "HKEY_CLASSES_ROOT\Folder\shell\filebot_anchor" /v "Icon" /t REG_SZ /d "\"C:\\Program Files\\FileBot\\filebot.exe\",0" /f
+
+	if not errorlevel 0 GOTO ERR1
+
+	echo First Round of Registry Entries Complete >> %logfile%
+
+GOTO ASKCOUNT
+
+
+:ASKCOUNT
+
+	GOTO request-lang-count
+
+	:request-lang-count
+	call :inputbox "How many subtitle languages do you want to fetch?" "Number of Subtitle Language" "1"
+
+		if NOT "%Input%"=="" (
+			GOTO count-check
+		) ELSE (
+			GOTO count-default
+		)
+
+		:count-check
+		SET /A TestVal="%Input%"*1
+
+		if "%TestVal%"=="%Input%" (
+			GOTO check-min
+		) ELSE (
+			:: input was not a number
+			GOTO count-default
+		)
+
+		:check-min
+		if %Input% GEQ 1 (
+			:: one or more
+			GOTO count-fixed
+		) ELSE (
+			:: less than one
+			GOTO count-default
+		)
+
+		:count-fixed
+			set "langcount=%Input%"
+			echo Subtitle Languages Required: %langcount% >> %logfile%
+		GOTO finished-count-output
+
+		:count-default	
+			set "langcount=1"
+			echo Invalid Input Detected. Defaulting to %langcount% >> %logfile%
+		GOTO finished-count-output
+
+		:finished-count-output
+
+	if not errorlevel 0 GOTO ERR1
+
+GOTO StartLoop
+	
+	
+:StartLoop
+
+	SET COUNT=0
+
+	:CountLoop
+	
+		if %COUNT% GEQ %langcount% (
+			:: done checking for subtitles
+			GOTO ALLOK
+		) ELSE (
+			:: input was not a number
+			GOTO LANG-PROCESS
+		)
+
+		:LANG-PROCESS
+
+			call :ASKLANG
+
+			if "%COUNT%"=="0" (
+				call :CHANGELANG
+			) ELSE (
+				call :CHANGELANGMULTI
+			)
+
+		SET /A COUNT+=1
+		
+	if not errorlevel 0 GOTO ERR1
+
+GOTO CountLoop
+
+
+:ASKLANG
+	set /a subCount=%COUNT%+1
+
+	set subCountChk1=%subCount:~-2,2%
+
+	IF %subCountChk1% EQU 11 ( 
+		GOTO set-th
+	) ELSE ( 
+		IF %subCountChk1% EQU 12 ( 
+			GOTO set-th
+		) ELSE ( 
+			IF %subCountChk1% EQU 13 ( 
+				GOTO set-th 
+			) ELSE ( 
+				GOTO set-other
+			)
+		)
+	)
+
+	:set-th
+		set "subCount=%subCount%th"
+	GOTO lang-output
+
+	:set-other
+		set subCountChk2=%subCount:~-1,1%
+		IF %subCountChk2% EQU 0 (set "subCount=%subCount%th")
+		IF %subCountChk2% EQU 1 (set "subCount=%subCount%st")
+		IF %subCountChk2% EQU 2 (set "subCount=%subCount%nd")
+		IF %subCountChk2% EQU 3 (set "subCount=%subCount%rd")
+		IF %subCountChk2% GEQ 4 (set "subCount=%subCount%th")
+	GOTO lang-output
+
+	:lang-output
+		call :inputbox "Please enter the %subCount% of %langcount% preferred subtitle language(s) using the two digit language code" "Subtitle Language Selection" "en"
+
+		if NOT "%Input%"=="" (
+			GOTO lang-fixed
+		) ELSE (
+			GOTO lang-default
+		)
+
+		:lang-fixed
+			set "newlang=%Input%"
+			echo New Subtitle Language: %newlang% >> %logfile%
+		GOTO finished-output
+
+		:lang-default	
+			set "newlang=en"
+			echo No Language Detected. Defaulting to %newlang% >> %logfile%
+		GOTO finished-output
+
+	:finished-output
+
+	if not errorlevel 0 GOTO ERR1
+exit /b
+
+
+:CHANGELANG
+	echo Configuring Subtitle Fetch Language Settings (%newlang%) >> %logfile%
+
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -get-subtitles \"%%1\" -non-strict --lang %newlang% --log-file context.log" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -get-subtitles \"%%1\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO" /f
+
+	if not errorlevel 0 GOTO ERR1
+	
+	echo Update Successful (%newlang%). >> %logfile%
+exit /b
+
+
+:CHANGELANGMULTI
+	echo Updating Language Settings (%newlang%) >> %logfile%
+
+	set "File0203add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "File0204add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
+	    set File0203current=%%A %%B
+	    )
+	set "File0203current=%File0203current% ^&^& %File0203add%"
+	set "File0203current=%File0203current:"=^\"%"
+	set "File0203current=%File0203current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /ve`) DO (
+	    set File0204current=%%A %%B
+	    )
+	set "File0204current=%File0204current% ^&^& %File0204add%"
+	set "File0204current=%File0204current:"=^\"%"
+	set "File0204current=%File0204current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
+	    set Folder0203current=%%A %%B
+	    )
+	set "Folder0203current=%Folder0203current% ^&^& %Folder0203add%"
+	set "Folder0203current=%Folder0203current:"=^\"%"
+	set "Folder0203current=%Folder0203current:^=%"
+
+	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /ve`) DO (
+	    set Folder0204current=%%A %%B
+	    )
+	set "Folder0204current=%Folder0204current% ^&^& %Folder0204add%"
+	set "Folder0204current=%Folder0204current:"=^\"%"
+	set "Folder0204current=%Folder0204current:^=%"
+
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%File0203current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%File0204current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%Folder0203current%" /f
+	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%Folder0204current%" /f
+
+	if not errorlevel 0 GOTO ERR1
+	
+	echo Update Successful (%newlang%). >> %logfile%
+exit /b
 
 
 :UNINSTALL-STEP1
@@ -465,26 +727,24 @@ GOTO ALLOK
 		echo No Jar Auto Updater to Delete >> %logfile%
 	)
 
-	echo File Removal Complete. Proceeding to reg file uninstall.
+	echo File Removal Complete. Proceeding to Registry Uninstall.
 
 GOTO UNINSTALL-REGONLY
 
 
 :UNINSTALL-REGONLY
 
-	echo Downloading Latest Uninstall Registry Script >> %logfile%
-
-	bitsadmin.exe /transfer "Download_Uninstall" "https://raw.github.com/CapriciousSage/cmdlets/master/context_menu_uninstall.reg" "%~dp0\context_menu_uninstall.reg"
-
 	echo Uninstalling Registry Entries >> %logfile%
-	regedit.exe /S "%~dp0\context_menu_uninstall.reg"
 
-	echo Deleting Temporary Uninstall File >> %logfile%
-	del "%~dp0\context_menu_uninstall.reg"
+	reg delete "HKEY_CLASSES_ROOT\FileBot" /f
+
+	reg delete "HKEY_CLASSES_ROOT\*\shell\filebot_anchor" /f
+
+	reg delete "HKEY_CLASSES_ROOT\Folder\shell\filebot_anchor" /f
 
 	if not errorlevel 0 GOTO ERR1
 
-	echo Reg Only Uninstall Complete >> %logfile%
+	echo Registry Entry Uninstall Complete >> %logfile%
 
 GOTO ALLOK
 
