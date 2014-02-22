@@ -614,7 +614,7 @@ exit /b
 	set "File0203add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "File0204add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
-	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0204add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set WatchSettingAdd=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log
 
 	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (

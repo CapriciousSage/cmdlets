@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Context Menu Subtitle Fetch Language Selector v1.1
+	FileBot Context Menu Subtitle Fetch Language Selector v1.2
 
 	Written by CapriciousSage (Ithiel)
 	Requires Filebot to be installed in C:\Program Files\FileBot\
@@ -133,6 +133,7 @@ GOTO ASKCOUNT
 :ASKCOUNT
 
 	set logfile="%tmp%\filebot_sub_fetch_lang_change.txt"
+	set WatchSetting="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
 
 	echo --------------------------------------- >> %logfile%
 	echo Context Menu Subtitle Language Selector >> %logfile%
@@ -283,6 +284,12 @@ exit /b
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO" /f
 
+	set WatchSettingLine1=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log
+	set WatchSettingLine2=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO
+
+	echo "%WatchSettingLine1%" > %WatchSetting%
+	echo "%WatchSettingLine2%" >> %WatchSetting%
+
 	if not errorlevel 0 GOTO ERR1
 	
 	echo Update Successful (%newlang%). >> %logfile%
@@ -295,7 +302,8 @@ exit /b
 	set "File0203add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "File0204add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
-	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "Folder0204add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set WatchSettingAdd=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log
 
 	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
 	    set File0203current=%%A %%B
@@ -329,6 +337,12 @@ exit /b
 	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%File0204current%" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%Folder0203current%" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%Folder0204current%" /f
+
+	set "WatchSettingLine1=%WatchSettingLine1%; %WatchSettingAdd%"
+	set "WatchSettingLine2=%WatchSettingLine2%; %WatchSettingAdd%"
+
+	echo "%WatchSettingLine1%" > %WatchSetting%
+	echo "%WatchSettingLine2%" >> %WatchSetting%
 
 	if not errorlevel 0 GOTO ERR1
 	
