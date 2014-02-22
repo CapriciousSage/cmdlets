@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.5.1 (Live Installer)
+	FileBot Advanced Context Menu v1.6 (Live Installer)
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
