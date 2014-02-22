@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.5.1
+	FileBot Advanced Context Menu v1.6
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -285,9 +285,15 @@ GOTO INSTALL-STEP2
 
 	echo Creating Folder Watch Scheduler Script  >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Folder_Watch" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_schedule_folder_watch.cmd" "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
+	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_schedule_folder_watch.cmd" "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
 
-	echo Finished Creating FileBot Jar Updater >> %logfile%
+	echo Finished Folder Watch Scheduler Script >> %logfile%
+
+	echo Creating Folder Watch Script  >> %logfile%
+
+	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" "https://github.com/CapriciousSage/cmdlets/raw/master/watch.cmd" "C:\Program Files\FileBot\cmdlets\watch.cmd"
+
+	echo Finished Folder Watch Script >> %logfile%
 
 	if not errorlevel 0 GOTO ERR1
 
@@ -771,6 +777,13 @@ GOTO ALLOK
 		del "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
 	) ELSE (
 		echo No Folder Watch Scheduler Script to Delete >> %logfile%
+	)
+
+	IF EXIST "C:\Program Files\FileBot\cmdlets\watch.cmd" (
+		echo Deleting "C:\Program Files\FileBot\cmdlets\watch.cmd" >> %logfile%
+		del "C:\Program Files\FileBot\cmdlets\watch.cmd"
+	) ELSE (
+		echo No Folder Watch Script to Delete >> %logfile%
 	)
 
 	:: remove any scheduled folder watch tasks

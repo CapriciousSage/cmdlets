@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Schedule Folder Watch Script v1.1
+	FileBot Schedule Folder Watch Scheduler Script v1.2
 	Written by CapriciousSage (Ithiel), inspired by Katates
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -131,7 +131,8 @@ GOTO SETUP
 :SETUP
 
 	set logfile="%tmp%\filebot_watch_script_log.txt"
-	set watchsettings="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
+	:: set watchsettings="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
+	set watchfile="C:\Progra~1\FileBot\cmdlets\watch.cmd"
 
 GOTO DetermineJobType
 
@@ -298,45 +299,8 @@ GOTO CreateTask
 
 :CreateTask
 
-	:: determine if creating match or non match task
-	if "%2"=="setnonmatch" (goto ScheduleNonMatch)
-	if "%2"=="setmatch" (goto ScheduleMatch)
-
-	if "%var2%"=="setnonmatch" (
-		goto ScheduleNonMatch
-	) ELSE ( 
-		if "%var2%"=="setmatch" (
-			goto ScheduleMatch
-		) ELSE (
-			GOTO ALLOK
-		)
-	)
-
-	if not errorlevel 0 GOTO ERR1
-
-GOTO ALLOK
-
-	
-:ScheduleNonMatch
-
-	set /p nonmatch=<%watchsettings%
-	call set nonmatch=%%nonmatch:PATH_HERE=%var1%%%
-	set nonmatch=%nonmatch:~1,-2%
 	ECHO Creating Folder Watch Task for %var1% >> %logfile%
-	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "powershell %nonmatch%; exit" /F >> %logfile%
-	if not errorlevel 0 GOTO ERR1
-	ECHO Task Created >> %logfile%
-
-GOTO ALLOK
-
-
-:ScheduleMatch
-
-	for /f "tokens=*" %%i in ('findstr MATCH_VIDEO %watchsettings%') do set match=%%i
-	call set match=%%match:PATH_HERE=%var1%%%
-	set match=%match:~1,-2%
-	ECHO Creating Folder Watch Task for %var1% >> %logfile%
-	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "powershell %match%; exit" /F >> %logfile%
+	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%1\" \"%2\"" /F >> %logfile%
 	if not errorlevel 0 GOTO ERR1
 	ECHO Task Created >> %logfile%
 
