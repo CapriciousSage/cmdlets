@@ -322,11 +322,6 @@ GOTO ALLOK
 	set /p nonmatch=<%watchsettings%
 	call set nonmatch=%%nonmatch:PATH_HERE=%var1%%%
 	set nonmatch=%nonmatch:~1,-2%
-
-	echo %nonmatch%
-	:: echo schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "powershell %nonmatch%; exit"
-	PAUSE
-	
 	ECHO Creating Folder Watch Task for %var1% >> %logfile%
 	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "powershell %nonmatch%; exit" /F >> %logfile%
 	if not errorlevel 0 GOTO ERR1
