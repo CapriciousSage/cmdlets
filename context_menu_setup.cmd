@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.5
+	FileBot Advanced Context Menu v1.5.1
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -644,8 +644,8 @@ exit /b
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%Folder0203current%" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%Folder0204current%" /f
 
-	set "WatchSettingLine1=%WatchSettingLine1% && %WatchSettingAdd%"
-	set "WatchSettingLine2=%WatchSettingLine2% && %WatchSettingAdd%"
+	set "WatchSettingLine1=%WatchSettingLine1%; %WatchSettingAdd%"
+	set "WatchSettingLine2=%WatchSettingLine2%; %WatchSettingAdd%"
 
 	echo "%WatchSettingLine1%" > %WatchSetting%
 	echo "%WatchSettingLine2%" >> %WatchSetting%
