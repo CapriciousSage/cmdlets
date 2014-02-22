@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.4
+	FileBot Advanced Context Menu v1.5
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -10,10 +10,10 @@ GOTO EndComment
 	FileBot: http://www.filebot.net
 
 	Help Support FileBot!
-	Please Donate via PayPal to reinhard.pointner@gmail.com
+	Please Donate via PayPal: http://www.filebot.net/donate.html
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 16/02/2014
+	Last Updated: 22/02/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -135,6 +135,7 @@ GOTO SETUP
 	set outputfile="C:\Program Files\FileBot\cmdlets\output.txt"
 	set oslogin="C:\Program Files\FileBot\cmdlets\opensubtitles_login.cmd"
 	set remlangtag="C:\Program Files\FileBot\cmdlets\remove-language-tag.cmd"
+	set WatchSetting="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
 	:: set newline=^& echo.
 	mkdir "C:\Program Files\FileBot\cmdlets"
 
@@ -282,6 +283,12 @@ GOTO INSTALL-STEP2
 
 	echo Finished Subtitle Fetch Language Changer >> %logfile%
 
+	echo Creating Folder Watch Scheduler Script  >> %logfile%
+
+	bitsadmin.exe /transfer "Download_Folder_Watch" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_schedule_folder_watch.cmd" "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
+
+	echo Finished Creating FileBot Jar Updater >> %logfile%
+
 	if not errorlevel 0 GOTO ERR1
 
 GOTO INSTALL-STEP3
@@ -407,6 +414,16 @@ GOTO PROCESS-REG
 			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\002ArtworkMovies\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:artwork.tmdb \"%%1\" --log-file context.log" /f
 			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles with Language Tag (OpenSubtitles)" /f
 			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles" /v "MUIVerb" /t REG_SZ /d "Subtitles without Language Tag (OpenSubtitles)" /f
+
+		:: Watch
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch" /v "MUIVerb" /t REG_SZ /d "Watch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch" /v "ExtendedSubCommandsKey" /t REG_SZ /d "FileBot\\Folder_Menu\\shell\\003Watch" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\003Subtitles" /v "MUIVerb" /t REG_SZ /d "Schedule Watch for Subtitles with Language Tag (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c call \"C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd\" \"%%1\" \"setnonmatch\"" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\004Subtitles" /v "MUIVerb" /t REG_SZ /d "Schedule Watch for Subtitles without Language Tag (OpenSubtitles)" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c call \"C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd\" \"%%1\" \"setmatch\"" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\005Subtitles" /v "MUIVerb" /t REG_SZ /d "Remove Scheduled Subtitle Fetch Task for this Folder" /f
+			reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\003Watch\shell\005Subtitles\command" /v "" /t REG_SZ /d "cmd /c call \"C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd\" \"%%1\" \"removetask\"" /f
 
 	:: Menu Call
 		:: File Menu
@@ -571,6 +588,12 @@ exit /b
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "cmd /c filebot -script fn:suball \"%%1\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO" /f
 
+	set "WatchSettingLine1=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log"
+	set "WatchSettingLine2=cmd /c filebot -script fn:suball \"PATH_HERE\" -non-strict --lang %newlang% --log-file context.log --format MATCH_VIDEO"
+
+	echo %WatchSettingLine1% > %WatchSetting%
+	echo %WatchSettingLine2% >> %WatchSetting%
+
 	if not errorlevel 0 GOTO ERR1
 	
 	echo Update Successful (%newlang%). >> %logfile%
@@ -584,6 +607,7 @@ exit /b
 	set "File0204add=cmd /c filebot -get-subtitles "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
 	set "Folder0203add=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
+	set "WatchSettingAdd=cmd /c filebot -script fn:suball "%%1" -non-strict --lang %newlang% --log-file context.log"
 
 	FOR /F "usebackq tokens=3*" %%A IN (`REG QUERY "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\003Subtitles\command" /ve`) DO (
 	    set File0203current=%%A %%B
@@ -617,6 +641,12 @@ exit /b
 	reg add "HKEY_CLASSES_ROOT\FileBot\File_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%File0204current%" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\003Subtitles\command" /v "" /t REG_SZ /d "%Folder0203current%" /f
 	reg add "HKEY_CLASSES_ROOT\FileBot\Folder_Menu\shell\002Fetch\shell\004Subtitles\command" /v "" /t REG_SZ /d "%Folder0204current%" /f
+
+	set "WatchSettingLine1=%WatchSettingLine1% && %WatchSettingAdd%"
+	set "WatchSettingLine2=%WatchSettingLine2% && %WatchSettingAdd%"
+
+	echo %WatchSettingLine1% > %WatchSetting%
+	echo %WatchSettingLine2% >> %WatchSetting%
 
 	if not errorlevel 0 GOTO ERR1
 	
@@ -670,6 +700,13 @@ GOTO ALLOK
 	) ELSE (
 		echo No Subtitle Language Tag Removal Script to Delete >> %logfile%
 	)
+
+	IF EXIST %WatchSetting% (
+		echo Deleting %WatchSetting% >> %logfile%
+		del %WatchSetting%
+	) ELSE (
+		echo No Watch Folder Settings File to Delete >> %logfile%
+	)	
 
 	IF EXIST "C:\Program Files\FileBot\cmdlets\anime.txt" (
 		echo Deleting "C:\Program Files\FileBot\cmdlets\anime.txt" >> %logfile%
@@ -726,6 +763,16 @@ GOTO ALLOK
 	) ELSE (
 		echo No Jar Auto Updater to Delete >> %logfile%
 	)
+
+	IF EXIST "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd" (
+		echo Deleting "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd" >> %logfile%
+		del "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
+	) ELSE (
+		echo No Folder Watch Scheduler Script to Delete >> %logfile%
+	)
+
+	:: remove any scheduled folder watch tasks
+	schtasks /delete /TN "FileBot-Watch *" /f
 
 	echo File Removal Complete. Proceeding to Registry Uninstall.
 
