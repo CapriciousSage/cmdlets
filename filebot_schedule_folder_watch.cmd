@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Schedule Folder Watch Scheduler Script v1.2
+	FileBot Schedule Folder Watch Scheduler Script v1.3
 	Written by CapriciousSage (Ithiel), inspired by Katates
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -131,6 +131,8 @@ GOTO SETUP
 :SETUP
 
 	set logfile="%tmp%\filebot_watch_script_log.txt"
+	set "watchlist=C:\Progra~1\FileBot\cmdlets\watch_list.txt"
+	set "watchlist2=%tmp%\watch_list_temp.txt"
 	:: set watchsettings="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
 	set watchfile="C:\Progra~1\FileBot\cmdlets\watch.cmd"
 
@@ -301,6 +303,7 @@ GOTO CreateTask
 
 	ECHO Creating Folder Watch Task for %var1% >> %logfile%
 	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%1\" \"%2\"" /F >> %logfile%
+	echo FileBot-Watch %var3%>> "%watchlist%"
 	if not errorlevel 0 GOTO ERR1
 	ECHO Task Created >> %logfile%
 
@@ -310,8 +313,11 @@ GOTO ALLOK
 :RemoveTask
 
 	ECHO Deleting Folder Watch for %var1% >> %logfile%
-	:: remove task for this folder
+	:: remove task for this folder and remove it from the watch list
 	schtasks /delete /TN "FileBot-Watch %var3%" /f >> %logfile%
+	findstr /v /i "%var3%" "%watchlist%" > "%watchlist2%"
+	type "%watchlist2%" > "%watchlist%"
+	del "%watchlist2%"
 	ECHO Task Deleted >> %logfile%
 
 	if not errorlevel 0 GOTO ERR1

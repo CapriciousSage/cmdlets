@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.6.1
+	FileBot Advanced Context Menu v1.7
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -136,6 +136,7 @@ GOTO SETUP
 	set oslogin="C:\Program Files\FileBot\cmdlets\opensubtitles_login.cmd"
 	set remlangtag="C:\Program Files\FileBot\cmdlets\remove-language-tag.cmd"
 	set WatchSetting="C:\Program Files\FileBot\cmdlets\watch_settings.txt"
+	set "watchlist=C:\Progra~1\FileBot\cmdlets\watch_list.txt"
 	:: set newline=^& echo.
 	mkdir "C:\Program Files\FileBot\cmdlets"
 
@@ -235,9 +236,9 @@ GOTO INSTALL-STEP2
 
 	echo Writing Output File %outputfile% >> %logfile%
 
-	echo %strOutputAnime% > %outputfile%
-	echo %strOutputTVShow% >> %outputfile%
-	echo %strOutputMovie% >> %outputfile%
+	echo %strOutputAnime%> %outputfile%
+	echo %strOutputTVShow%>> %outputfile%
+	echo %strOutputMovie%>> %outputfile%
 	echo. >> %outputfile%
 
 	echo ----------------------- >> %outputfile%
@@ -688,6 +689,9 @@ GOTO ALLOK
 
 :UNINSTALL-FULL
 
+	:: remove tasks BEFORE watch list is removed
+	for /f "delims=" %%a in (%watchlist%) do schtasks /delete /tn "%%a" /f >> %logfile%
+
 	IF EXIST %outputfile% (
 		echo Deleting %outputfile% >> %logfile%
 		del %outputfile%
@@ -714,7 +718,14 @@ GOTO ALLOK
 		del %WatchSetting%
 	) ELSE (
 		echo No Watch Folder Settings File to Delete >> %logfile%
-	)	
+	)
+
+	IF EXIST "%watchlist%" (
+		echo Deleting %watchlist% >> %logfile%
+		del "%watchlist%"
+	) ELSE (
+		echo No Watch List File to Delete >> %logfile%
+	)
 
 	IF EXIST "C:\Program Files\FileBot\cmdlets\anime.txt" (
 		echo Deleting "C:\Program Files\FileBot\cmdlets\anime.txt" >> %logfile%

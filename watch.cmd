@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Schedule Folder Watch Script v1.2
+	FileBot Schedule Folder Watch Script v1.3
 	Written by CapriciousSage (Ithiel), inspired by Katates
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -179,7 +179,7 @@ GOTO ALLOK
 
 :ScheduleMatch
 
-	set /p match=<%watchsettings%
+	for /f "tokens=*" %%i in ('findstr MATCH_VIDEO %watchsettings%') do set match=%%i
 	call set match=%%match:PATH_HERE=%var1%%%
 	call set match=%match:~0,-1%
 	ECHO Scanning Folder: %var1% >> %logfile%
