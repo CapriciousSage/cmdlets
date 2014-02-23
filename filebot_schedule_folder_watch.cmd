@@ -325,9 +325,7 @@ GOTO CreateTask
 :CreateTask
 
 	ECHO Creating Folder Watch Task for %var1% >> %logfile%
-	echo schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%var1%\" \"%var2%\"" /F
 	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%var1%\" \"%var2%\"" /F >> %logfile%
-	PAUSE
 	echo FileBot-Watch %var3%>> "%watchlist%"
 	if not errorlevel 0 GOTO ERR1
 	ECHO Task Created >> %logfile%
