@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Schedule Folder Watch Script v1.3
+	FileBot Schedule Folder Watch Script v1.4
 	Written by CapriciousSage (Ithiel), inspired by Katates
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -13,7 +13,7 @@ GOTO EndComment
 	Please Donate via PayPal: http://www.filebot.net/donate.html
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 22/02/2014
+	Last Updated: 24/02/2014
 :EndComment
 
 :ADMIN-CHECK

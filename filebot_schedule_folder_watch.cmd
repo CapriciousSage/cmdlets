@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Schedule Folder Watch Scheduler Script v1.3
+	FileBot Schedule Folder Watch Scheduler Script v1.4
 	Written by CapriciousSage (Ithiel), inspired by Katates
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -13,7 +13,7 @@ GOTO EndComment
 	Please Donate via PayPal: http://www.filebot.net/donate.html
 
 	No warranty given or implied, use at your own risk.
-	Last Updated: 22/02/2014
+	Last Updated: 24/02/2014
 :EndComment
 
 :ADMIN-CHECK
@@ -144,13 +144,36 @@ GOTO DetermineJobType
 	:: determine if adding or removing a task
 
 	set var1=%1
+	set var1=%var1:^=^^%
 	set var1=%var1:"=%
 
 	set var2=%2
 	set var2=%var2:"=%
 
-	set var3=%var1:\=-%
+	set var3=%var1:\\=%
+	set var3=%var3:_=%
+	set var3=%var3:\=_%
 	set var3=%var3::=%
+	set var3=%var3: =%
+	set var3=%var3:(=%
+	set var3=%var3:)=%
+	set var3=%var3:;=%
+	set var3=%var3:'=%
+	set var3=%var3:.=%
+	set var3=%var3:,=%
+	set var3=%var3:-=%
+	set var3=%var3:+=%
+	set var3=%var3:{=%
+	set var3=%var3:}=%
+	set var3=%var3:[=%
+	set var3=%var3:]=%
+	set var3=%var3:!=%
+	set var3=%var3:@=%
+	set var3=%var3:#=%
+	set var3=%var3:$=%
+	set var3=%var3:^=%
+	set var3=%var3:&=%
+
 
 	if "%var2%"=="setnonmatch" (
 		goto AskDetails
@@ -302,7 +325,9 @@ GOTO CreateTask
 :CreateTask
 
 	ECHO Creating Folder Watch Task for %var1% >> %logfile%
-	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%1\" \"%2\"" /F >> %logfile%
+	echo schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%var1%\" \"%var2%\"" /F
+	schtasks /create /sc %scanmetric% /mo %scanunits% /tn "FileBot-Watch %var3%" /tr "cmd /c call %watchfile% \"%var1%\" \"%var2%\"" /F >> %logfile%
+	PAUSE
 	echo FileBot-Watch %var3%>> "%watchlist%"
 	if not errorlevel 0 GOTO ERR1
 	ECHO Task Created >> %logfile%
