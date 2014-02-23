@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.6 (Live Installer)
+	FileBot Advanced Context Menu v1.6.1 (Live Installer)
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -134,7 +134,7 @@ GOTO CALL-SETUP
 	
 	echo Downloading Latest Setup File >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Install" "https://github.com/CapriciousSage/cmdlets/raw/master/context_menu_setup.cmd" "%~dp0\context_menu_setup.cmd"
+	bitsadmin.exe /transfer "Download_Install" /priority foreground "https://github.com/CapriciousSage/cmdlets/raw/master/context_menu_setup.cmd" "%~dp0\context_menu_setup.cmd"
 
 	echo Running Setup File >> %logfile%
 	call "%~dp0\context_menu_setup.cmd"

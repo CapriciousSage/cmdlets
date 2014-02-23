@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Automatic jar file Updater v1.4
+	FileBot Automatic jar file Updater v1.4.1
 
 	Written by CapriciousSage (Ithiel)
 	With assistance from rednoah and Akkifokkusu
@@ -144,7 +144,7 @@ GOTO DOWNLOAD
 	echo. >> %logfile%
 
 	echo Downloading Latest Filebot.jar from %downloadURL% >> %logfile%
-	bitsadmin.exe /transfer "Download_FileBot" %downloadURL% "%tmp%\FileBot.jar"
+	bitsadmin.exe /transfer "Download_FileBot" /priority foreground %downloadURL% "%tmp%\FileBot.jar"
 
 	if not errorlevel 0 GOTO ERR1
 	

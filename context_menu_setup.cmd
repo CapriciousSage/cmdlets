@@ -1,7 +1,7 @@
 @echo OFF
 
 GOTO EndComment
-	FileBot Advanced Context Menu v1.6
+	FileBot Advanced Context Menu v1.6.1
 	Written by CapriciousSage (Ithiel) with assistance from rednoah (Reinhard Pointner)
 	Requires Windows 7 or higher.
 	This file requires Administrative Privileges
@@ -273,25 +273,25 @@ GOTO INSTALL-STEP2
 
 	echo Creating FileBot Jar Updater >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Auto_Updater" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_auto_jar_updater.cmd" "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd"
+	bitsadmin.exe /transfer "Download_Auto_Updater" /priority foreground "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_auto_jar_updater.cmd" "C:\Program Files\FileBot\cmdlets\filebot_auto_jar_updater.cmd"
 
 	echo Finished Creating FileBot Jar Updater >> %logfile%
 
 	echo Creating Subtitle Fetch Language Changer >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Sub_Lang_Changer" "https://github.com/CapriciousSage/cmdlets/raw/master/change_subtitle_fetch_language.cmd" "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd"
+	bitsadmin.exe /transfer "Download_Sub_Lang_Changer" /priority foreground "https://github.com/CapriciousSage/cmdlets/raw/master/change_subtitle_fetch_language.cmd" "C:\Program Files\FileBot\cmdlets\change_subtitle_fetch_language.cmd"
 
 	echo Finished Subtitle Fetch Language Changer >> %logfile%
 
 	echo Creating Folder Watch Scheduler Script  >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_schedule_folder_watch.cmd" "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
+	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" /priority foreground "https://github.com/CapriciousSage/cmdlets/raw/master/filebot_schedule_folder_watch.cmd" "C:\Program Files\FileBot\cmdlets\filebot_schedule_folder_watch.cmd"
 
 	echo Finished Folder Watch Scheduler Script >> %logfile%
 
 	echo Creating Folder Watch Script  >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" "https://github.com/CapriciousSage/cmdlets/raw/master/watch.cmd" "C:\Program Files\FileBot\cmdlets\watch.cmd"
+	bitsadmin.exe /transfer "Download_Folder_Watch_Scheduler" /priority foreground "https://github.com/CapriciousSage/cmdlets/raw/master/watch.cmd" "C:\Program Files\FileBot\cmdlets\watch.cmd"
 
 	echo Finished Folder Watch Script >> %logfile%
 
@@ -340,15 +340,15 @@ GOTO PROCESS-REG
 
 	echo Downloading Latest Rename Schemes for Local Management >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Anime_Scheme" "https://raw.github.com/CapriciousSage/schemes/master/anime.txt" "C:\Program Files\FileBot\cmdlets\anime.txt"
-	bitsadmin.exe /transfer "Download_TV_Shows_Scheme" "https://raw.github.com/CapriciousSage/schemes/master/tv_shows.txt" "C:\Program Files\FileBot\cmdlets\tv_shows.txt"
-	bitsadmin.exe /transfer "Download_Movies_Scheme" "https://raw.github.com/CapriciousSage/schemes/master/movies.txt" "C:\Program Files\FileBot\cmdlets\movies.txt"
+	bitsadmin.exe /transfer "Download_Anime_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/schemes/master/anime.txt" "C:\Program Files\FileBot\cmdlets\anime.txt"
+	bitsadmin.exe /transfer "Download_TV_Shows_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/schemes/master/tv_shows.txt" "C:\Program Files\FileBot\cmdlets\tv_shows.txt"
+	bitsadmin.exe /transfer "Download_Movies_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/schemes/master/movies.txt" "C:\Program Files\FileBot\cmdlets\movies.txt"
 
 	echo Downloading Latest Groovy Files for Local Management >> %logfile%
 
-	bitsadmin.exe /transfer "Download_Anime_Scheme" "https://raw.github.com/CapriciousSage/scripts/master/anime_local.groovy" "C:\Program Files\FileBot\cmdlets\anime.groovy"
-	bitsadmin.exe /transfer "Download_TV_Shows_Scheme" "https://raw.github.com/CapriciousSage/scripts/master/tv_shows_local.groovy" "C:\Program Files\FileBot\cmdlets\tv_shows.groovy"
-	bitsadmin.exe /transfer "Download_Movies_Scheme" "https://raw.github.com/CapriciousSage/scripts/master/movies_local.groovy" "C:\Program Files\FileBot\cmdlets\movies.groovy"
+	bitsadmin.exe /transfer "Download_Anime_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/scripts/master/anime_local.groovy" "C:\Program Files\FileBot\cmdlets\anime.groovy"
+	bitsadmin.exe /transfer "Download_TV_Shows_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/scripts/master/tv_shows_local.groovy" "C:\Program Files\FileBot\cmdlets\tv_shows.groovy"
+	bitsadmin.exe /transfer "Download_Movies_Scheme" /priority foreground "https://raw.github.com/CapriciousSage/scripts/master/movies_local.groovy" "C:\Program Files\FileBot\cmdlets\movies.groovy"
 
 	echo Settings Local Groovy Path
 	set groovyPath=C:\\Program Files\\FileBot\\cmdlets\\
